@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ViewsAI Social Video Engine</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header>
+  <div class="brand"><span class="logo">V</span> ViewsAI <em>Social Video Engine</em></div>
+  <div class="tag">Local studio · your videos never leave this computer · $0 tools</div>
+</header>
+
+<main>
+  <!-- STEP 1 : UPLOAD -->
+  <section class="card" id="card-upload">
+    <h2><span class="n">1</span> Upload one master clip</h2>
+    <div id="drop" class="drop">
+      <input type="file" id="file" accept="video/*" hidden>
+      <div id="drop-inner">
+        <div class="big">🎬</div>
+        <p><b>Drag &amp; drop</b> your video here or <u>browse</u></p>
+        <p class="hint">MP4 / MOV — any length, we trim to each platform's cap.</p>
+      </div>
+    </div>
+    <div id="master-meta" class="meta hidden">
+      <div class="meta-pill">✓ <span id="m-name"></span></div>
+      <div class="meta-row">
+        <span class="chip" id="m-size"></span>
+        <span class="chip" id="m-dur"></span>
+        <span class="chip" id="m-audio"></span>
+      </div>
+      <button id="replace" class="ghost">Replace file</button>
+    </div>
+  </section>
+
+  <!-- STEP 2 : TEXT -->
+  <section class="card">
+    <h2><span class="n">2</span> Text overlay</h2>
+    <div class="grid2">
+      <label>Hook / headline <small>(top, first ~3s)</small>
+        <input id="title" maxlength="90" placeholder="The blue eye sees everything">
+      </label>
+      <label>Caption <small>(lower third, stays up)</small>
+        <input id="caption" maxlength="160" placeholder="Kobe. ViewsAI office dog.">
+      </label>
+    </div>
+    <div class="grid2">
+      <label>CTA <small>(bottom, last ~3s)</small>
+        <input id="cta" maxlength="60" placeholder="Follow @viewsai">
+      </label>
+      <div class="colors">
+        <label>Accent <input type="color" id="accent" value="#ffd60a"></label>
+        <label>Text <input type="color" id="fg" value="#e6e9f0"></label>
+        <label class="check"><input type="checkbox" id="no-text"> No text</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3 : PLATFORMS -->
+  <section class="card">
+    <h2><span class="n">3</span> Where does it go? <span class="tools">
+      <button id="all" class="mini">All</button>
+      <button id="clear" class="mini">Clear</button>
+    </span></h2>
+    <div id="plats" class="plats"></div>
+    <div class="grid2 opts">
+      <label>Frame mode
+        <select id="mode">
+          <option value="auto">Auto (smart)</option>
+          <option value="crop">Crop to fill</option>
+          <option value="blurpad">Blur pad background</option>
+        </select>
+      </label>
+      <label class="check big"><input type="checkbox" id="cover" checked> Also export a 9:16 cover image</label>
+    </div>
+  </section>
+
+  <!-- CREATE -->
+  <section class="createbar">
+    <button id="go" class="go" disabled>⚡ Create Videos</button>
+    <div id="err" class="err hidden"></div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section class="card hidden" id="card-progress">
+    <h2>Rendering <span id="prog-pill" class="pill"></span></h2>
+    <div class="bar"><div id="barfill"></div></div>
+    <ul id="proglist"></ul>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="card hidden" id="card-results">
+    <h2>✓ Your platform-ready files</h2>
+    <div id="results" class="results"></div>
+  </section>
+</main>
+
+<footer>ViewsAI Social Video Engine · runs 100% locally · ffmpeg + free tools</footer>
+<script src="/static/app.js"></script>
+</body>
+</html>
