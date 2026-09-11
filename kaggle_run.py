@@ -21,20 +21,27 @@ HERE = Path(__file__).resolve().parent
 KAGGLE_DIR = HERE / "kaggle"
 UPLOADS = Path.home() / "Social Media MASTER/kobe-library/colab-uploads"
 DEST = Path.home() / "Social Media MASTER/kobe-library/movement"
+KAGGLE_BIN = str(Path.home() / ".venvs/kaggle/bin/kaggle")
+USERNAME = "brendanrobrien4"
 DATASET_SLUG = "kobe-inputs"
 
 
 def sh(cmd, check=True, capture=True):
+    # always use the durable py3.12 venv's kaggle CLI
+    cmd = cmd.replace("kaggle ", KAGGLE_BIN + " ", 1) if cmd.startswith("kaggle ") else cmd
     return subprocess.run(cmd, shell=True, check=check, text=True,
                           capture_output=capture)
 
 
 def kaggle_ok():
-    if not (Path.home() / ".kaggle" / "kaggle.json").exists():
-        print("✗ missing ~/.kaggle/kaggle.json")
-        print("  1. kaggle.com/settings → API → Create New Token (free)")
-        print("  2. mkdir -p ~/.kaggle && mv ~/Downloads/kaggle.json ~/.kaggle/ && chmod 600 ~/.kaggle/kaggle.json")
+    has_token = (Path.home() / ".kaggle" / "access_token").exists()
+    has_json = (Path.home() / ".kaggle" / "kaggle.json").exists()
+    if not (has_token or has_json):
+        print("✗ no Kaggle credentials found")
+        print("  kaggle.com/settings → API → Create New Token")
+        print("  then: echo KGAT_xxx > ~/.kaggle/access_token && chmod 600 ~/.kaggle/access_token")
         return False
+    print("✓ auth:", "access_token" if has_token else "kaggle.json")
     try:
         r = sh("kaggle --version")
         print("✓ kaggle CLI:", (r.stdout or '').strip())
@@ -45,10 +52,7 @@ def kaggle_ok():
 
 
 def user():
-    try:
-        return json.loads((Path.home() / ".kaggle" / "kaggle.json").read_text())["username"]
-    except Exception:
-        return "bro768644"
+    return USERNAME
 
 
 def setup_dataset():

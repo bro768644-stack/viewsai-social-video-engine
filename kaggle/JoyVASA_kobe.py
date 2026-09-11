@@ -9,10 +9,38 @@ import shutil
 import subprocess
 import sys
 
+import shutil as _sh
+
 print("=== JoyVASA on Kaggle ===", flush=True)
-subprocess.run(["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader"], check=False)
+
+# GPU check (guarded — nvidia-smi may be absent; never let this kill the run)
+if _sh.which("nvidia-smi"):
+    try:
+        r = subprocess.run(["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader"],
+                           capture_output=True, text=True, check=False)
+        print("GPU:", (r.stdout or r.stderr or "").strip(), flush=True)
+    except Exception as e:
+        print("GPU check skipped:", str(e)[:60], flush=True)
+else:
+    print("WARNING: nvidia-smi not found — GPU may be disabled for this kernel", flush=True)
+
+# torch CUDA sanity (tells us definitively whether the GPU is attached)
+try:
+    import torch
+    print("torch:", torch.__version__, "| cuda available:", torch.cuda.is_available(), flush=True)
+except Exception as e:
+    print("torch check skipped:", str(e)[:60], flush=True)
 
 # ---------------------------------------------------------------- inputs
+print("=== /kaggle/input listing ===", flush=True)
+for root, dirs, files in os.walk("/kaggle/input"):
+    for f in files:
+        print("  ", os.path.join(root, f), flush=True)
+print("=== env hints ===", flush=True)
+for k in ("KAGGLE_KERNEL_RUN_TYPE", "KAGGLE_URL_BASE", "CUDA_VISIBLE_DEVICES"):
+    if k in os.environ:
+        print(f"  {k}={os.environ[k]}", flush=True)
+
 INPUT_DIRS = glob.glob("/kaggle/input/*")
 IMG = AUDIO = None
 for d in INPUT_DIRS:
@@ -26,6 +54,18 @@ print("image:", IMG, flush=True)
 print("audio:", AUDIO, flush=True)
 if not IMG or not AUDIO:
     sys.exit("ERROR: upload a dataset containing kobe.png + kobe.wav")
+
+# hard stop if there's no GPU or no internet — saves a wasted 15-minute run
+try:
+    import torch as _t
+    if not _t.cuda.is_available():
+        print("!! NO CUDA — Kaggle GPU not enabled for this kernel.", flush=True)
+        print("!! Fix: kaggle.com/settings -> Phone Verification (required for GPU + internet).", flush=True)
+        raise SystemExit(3)
+except SystemExit:
+    raise
+except Exception:
+    pass
 
 # ---------------------------------------------------------------- install
 subprocess.run("apt-get -qq install -y ffmpeg git-lfs > /dev/null 2>&1", shell=True, check=False)
