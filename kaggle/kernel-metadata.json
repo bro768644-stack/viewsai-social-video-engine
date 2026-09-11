@@ -1,0 +1,14 @@
+{
+  "id": "bro768644/joyvasa-kobe-talking",
+  "title": "JoyVASA Kobe Talking Clip",
+  "code_file": "JoyVASA_kobe.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": ["bro768644/kobe-inputs"],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}
