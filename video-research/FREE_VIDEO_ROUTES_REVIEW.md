@@ -99,3 +99,35 @@ For the **Brendan** side of the duo: LatentSync Space via API (add the free HF t
 ## The single unlock you need
 **A free Hugging Face account token** (`huggingface.co/settings/tokens`) — it raises ZeroGPU quota so
 LatentSync/EchoMimic run for free. Everything else needs no accounts at all.
+
+---
+
+# ⚠️ LIVE TEST RESULTS (2026-09-05, with real HF token)
+
+## The ZeroGPU quota reality — measured
+```
+"You have exceeded your free ZeroGPU quota (180s requested vs. 261s left).
+ Try again in 23:58:14. Subscribe to HF PRO to get 25 min of ZeroGPU quota a day"
+```
+- Free HF ZeroGPU allowance = **~300s GPU/day total** (5 min)
+- **LatentSync reserves 180s per call** → ~1 run/day; **failed attempts still burn quota**
+- **EchoMimic reserves 200s per call** → ~1 run/day
+- Resets every 24h
+- Token verified working (got past the "duration too large" gate immediately)
+
+## Verdict per route
+| Route | Free? | Kobe (animal)? | Daily capacity |
+|---|---|---|---|
+| **JoyVASA — free Colab T4** | ✅ | ✅ **YES (animal mode)** | 1+ (Colab session limits, no ZeroGPU cap) |
+| LatentSync HF Space | ✅ ~1/day | ❌ human faces | 1 (180s/call of ~300s) |
+| EchoMimic HF Space | ✅ ~1/day | ❌ human faces | 1 (200s/call) |
+| Hedra | ❌ $15/mo | ✅ | — |
+
+## ⭐ THE REVISED PLAN — run BOTH on one free Colab T4 session
+Instead of splitting across quota-limited Spaces, do **Kobe + Brendan in the same Colab T4 run**:
+1. **JoyVASA** (`animation_mode animal`) → Kobe talking clip ✅ the missing piece
+2. **LatentSync** (or MuseTalk) from the same Colab repo checkout → Brendan talking clip
+3. Download both → `assemble_kobe.py` (Kokoro voice + text) → `platform_render.py` (12 platforms)
+
+That routes around the 300s ZeroGPU cap entirely — Colab's T4 gives you a full session,
+no per-call GPU-second budget. **This is the 100% free daily video engine.**
