@@ -22,6 +22,11 @@ OUT = Path.home() / "Social Media MASTER/kobe-content"
 
 # hero movements rotated across posts (all vertical, best quality)
 MOVES = [
+    # newest / best first (auto-skipped if a clip is missing)
+    "video_1_1d5fac49b6f44dd4b145dca9578c79c3",
+    "Kobe_lebron_connical",
+    "kobe_body_views_only",
+    "ViewsAI_Orchestrator_9.16",
     "kobe-fullbody-desk-take3",
     "kobe-viewsai-take2",
     "kobe-headshot-mic",
@@ -115,8 +120,10 @@ def main():
 
     OUT.mkdir(parents=True, exist_ok=True)
     ok = fail = 0
+    lib = {f.stem for f in (Path.home() / "Social Media MASTER/kobe-library/movement").glob("*.mp4")}
+    usable = [m for m in MOVES if m in lib] or list(lib)
     for i, (slug, line, hook, cta, grp) in enumerate(posts):
-        move = MOVES[i % len(MOVES)]
+        move = usable[i % len(usable)]
         out = OUT / f"{slug}.mp4"
         if out.exists():
             print(f"  ✓ skip (exists) {slug}")
