@@ -37,9 +37,9 @@ def env(k, d=None):
 
 
 BASE = (env("LISTMONK_URL", "http://localhost:9000")).rstrip("/")
-USER = env("LISTMONK_API_USER", "admin")
+USER = env("LISTMONK_API_USER", "viewsai-api")
 TOKEN = env("LISTMONK_API_TOKEN")
-LIST_ID = int(env("LISTMONK_LIST_ID", "1"))
+LIST_ID = int(env("LISTMONK_LIST_ID", "1"))   # 3 = ViewsAI Newsletter (v6: no subscriber tags)
 
 
 def _call(path, method="GET", data=None, form=False):
@@ -64,9 +64,14 @@ def _call(path, method="GET", data=None, form=False):
 
 
 def subscriber_by_email(email):
+    """Listmonk v6: the SQL-ish `query` param 400s on /subscribers; `search` works."""
+    import urllib.parse
     try:
-        d = _call(f"/subscribers?query=subscriber.email='{email}'&page=1&per_page=5")
+        d = _call("/subscribers?page=1&per_page=20&search=" + urllib.parse.quote(email))
         results = (d.get("data") or {}).get("results") or []
+        for r in results:
+            if (r.get("email") or "").lower() == email.lower():
+                return r
         return results[0] if results else None
     except Exception as e:
         print("  lookup:", str(e)[:120])
@@ -74,23 +79,28 @@ def subscriber_by_email(email):
 
 
 def upsert(email, name=None, tags=None, attribs=None):
+    """Listmonk v6 has NO subscriber tags — everything goes in `attribs`.
+
+    `tags` are stored as attribs['tags'] (array) so segment queries still work:
+        subscriber.attribs->'tags' ? 'replied'
+    """
     tags = list(dict.fromkeys(t for t in (tags or []) if t))
     sub = subscriber_by_email(email)
+    existing = (sub or {}).get("attribs") or {}
+    merged_tags = list(dict.fromkeys((existing.get("tags") or []) + tags))
+    new_attribs = {**existing, **(attribs or {}), "tags": merged_tags}
     if sub:
-        new_tags = list(dict.fromkeys((sub.get("tags") or []) + tags))
         _call(f"/subscribers/{sub['id']}", "PUT", {
             "email": email, "name": sub.get("name") or name or email,
             "status": sub.get("status", "enabled"),
-            "lists": [LIST_ID], "tags": new_tags,
-            "attribs": {**(sub.get("attribs") or {}), **(attribs or {})},
+            "lists": [LIST_ID], "attribs": new_attribs,
         })
-        return "updated", sub["id"], new_tags
+        return "updated", sub["id"], merged_tags
     d = _call("/subscribers", "POST", {
         "email": email, "name": name or email, "status": "enabled",
-        "lists": [LIST_ID], "tags": tags, "attribs": attribs or {},
-        "preconfirm_subscriptions": True,
+        "lists": [LIST_ID], "attribs": new_attribs, "preconfirm_subscriptions": True,
     })
-    return "created", (d.get("data") or {}).get("id"), tags
+    return "created", (d.get("data") or {}).get("id"), merged_tags
 
 
 def setup_check():
