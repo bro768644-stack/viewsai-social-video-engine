@@ -74,6 +74,12 @@ def main():
     ap.add_argument("--no-text", action="store_true")
     ap.add_argument("--keep-audio", action="store_true",
                     help="clip already has lip-synced speech (JoyVASA) — don't mix a new VO")
+    ap.add_argument("--replace-audio", action="store_true",
+                    help="REPLACE the clip's audio with the new Kokoro line (clean; keeps a whisper of room tone)")
+    ap.add_argument("--keep-length", action="store_true",
+                    help="keep the clip's full duration (default: trim to the voice length)")
+    ap.add_argument("--room-tone", type=float, default=0.0,
+                    help="original audio level when replacing (0=fully silent, 0.08=subtle ambience)")
     args = ap.parse_args()
 
     movements = discover()
@@ -105,15 +111,40 @@ def main():
         vo_dur = dur(vo)
         v_dur = dur(src)
         base = OUTDIR / f"{out.stem}-voiced.mp4"
-        cmd = ["ffmpeg", "-y", "-i", str(src), "-i", str(vo),
-               "-filter_complex",
-               "[0:a]volume=0.25,apad[amb];[1:a]adelay=400|400,volume=2.2[vo];"
-               "[amb][vo]amix=inputs=2:duration=first:normalize=0,"
-               "loudnorm=I=-16:TP=-1.5:LRA=11[aout]",
-               "-map", "0:v", "-map", "[aout]", "-c:v", "copy", "-c:a", "aac",
-               "-b:a", "160k", "-t", str(min(v_dur, vo_dur + 1.0)), str(base)]
+
+        if args.replace_audio:
+            # REPLACE the track: silence (or a whisper of room tone) + the new line only.
+            # Voice starts at 0.35s; video is trimmed to the voice length.
+            have_orig = subprocess.run(
+                ["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries",
+                 "stream=codec_type", "-of", "csv=p=0", str(src)],
+                capture_output=True, text=True).stdout.strip() != ""
+            rt = max(0.0, float(args.room_tone))
+            if have_orig and rt > 0:
+                fc = (f"[0:a]volume={rt},apad[amb];"
+                      f"[1:a]adelay=350|350,volume=1.9[vo];"
+                      f"[amb][vo]amix=inputs=2:duration=first:normalize=0,"
+                      f"loudnorm=I=-16:TP=-1.5:LRA=11[aout]")
+            else:
+                fc = (f"[1:a]adelay=350|350,volume=1.9,apad,"
+                      f"loudnorm=I=-16:TP=-1.5:LRA=11[aout]")
+            # default: trim to the voice; --keep-length: use the whole clip
+            duration = v_dur if args.keep_length else (vo_dur + 0.7)
+            cmd = ["ffmpeg", "-y", "-i", str(src), "-i", str(vo),
+                   "-filter_complex", fc,
+                   "-map", "0:v", "-map", "[aout]", "-c:v", "copy", "-c:a", "aac",
+                   "-b:a", "160k", "-t", str(duration), str(base)]
+            print(f"audio REPLACED (room-tone={rt}) → {base.name}")
+        else:
+            cmd = ["ffmpeg", "-y", "-i", str(src), "-i", str(vo),
+                   "-filter_complex",
+                   "[0:a]volume=0.25,apad[amb];[1:a]adelay=400|400,volume=2.2[vo];"
+                   "[amb][vo]amix=inputs=2:duration=first:normalize=0,"
+                   "loudnorm=I=-16:TP=-1.5:LRA=11[aout]",
+                   "-map", "0:v", "-map", "[aout]", "-c:v", "copy", "-c:a", "aac",
+                   "-b:a", "160k", "-t", str(min(v_dur, vo_dur + 1.0)), str(base)]
+            print(f"voiced (mixed) → {base.name}")
         subprocess.run(cmd, check=True, capture_output=True)
-        print(f"voiced → {base.name}")
 
     if args.no_text:
         if base != out:
