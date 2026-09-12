@@ -1,0 +1,5 @@
+# Tracking Worker — open pixels, click redirects, page events
+name = "tracking"
+main = "tracking-worker.js"
+compatibility_date = "2026-08-09"
+workers_dev = true

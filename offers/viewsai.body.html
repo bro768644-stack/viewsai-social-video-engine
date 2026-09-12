@@ -1,0 +1,151 @@
+<section class="hero">
+  <span class="eyebrow">No credit card · No commitment · No pricing page</span>
+  <h1>Turn views<br>into outcomes.</h1>
+  <p class="sub">AI-powered recruiting and specialist agents that find, engage, qualify and move opportunities forward. Start with one. One search. One agent. Zero commitment.</p>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px;">
+    <a href="#search" style="background:#e8590c;color:#fff;font-weight:800;font-size:17px;padding:17px 34px;border-radius:14px;">Start 1 Free Recruiting Search</a>
+    <a href="#agent" style="background:#0f1e3d;color:#fff;font-weight:800;font-size:17px;padding:17px 34px;border-radius:14px;">Hire 1 Free Agent</a>
+  </div>
+</section>
+
+<section class="offer" id="choose">
+  <span class="offer-badge seven">What can ViewsAI do for you?</span>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:8px;">
+    <a href="#search" style="border:1px solid #e8eaf0;border-radius:16px;padding:24px;display:block;">
+      <div style="font-size:26px;margin-bottom:8px;">🎯</div>
+      <div style="font-weight:800;font-size:18px;margin-bottom:6px;">Hire someone</div>
+      <p style="color:#4a5a75;font-size:15px;margin:0;">Give us your hardest open role. We'll show you exactly who we'd target.</p>
+    </a>
+    <a href="#agent" style="border:1px solid #e8eaf0;border-radius:16px;padding:24px;display:block;">
+      <div style="font-size:26px;margin-bottom:8px;">🤖</div>
+      <div style="font-weight:800;font-size:18px;margin-bottom:6px;">Hire an AI specialist</div>
+      <p style="color:#4a5a75;font-size:15px;margin:0;">Pick one job you want off your plate. We'll build and deploy the first specialist.</p>
+    </a>
+    <a href="#workforce" style="border:1px solid #e8eaf0;border-radius:16px;padding:24px;display:block;">
+      <div style="font-size:26px;margin-bottom:8px;">🏗</div>
+      <div style="font-weight:800;font-size:18px;margin-bottom:6px;">Build a workforce</div>
+      <p style="color:#4a5a75;font-size:15px;margin:0;">Multiple roles, multiple agents, one system that runs them.</p>
+    </a>
+    <a href="#talk" style="border:1px solid #e8eaf0;border-radius:16px;padding:24px;display:block;">
+      <div style="font-size:26px;margin-bottom:8px;">🏢</div>
+      <div style="font-weight:800;font-size:18px;margin-bottom:6px;">Enterprise / complex</div>
+      <p style="color:#4a5a75;font-size:15px;margin:0;">Embedded teams, integrations, SLAs, exclusive coverage.</p>
+    </a>
+  </div>
+</section>
+
+<section class="offer" id="search">
+  <span class="offer-badge" style="background:#e6f7ee;color:#1a7f4e;">Your first search is on us</span>
+  <h2 style="font-size:clamp(30px,4.4vw,44px);font-weight:800;letter-spacing:-1px;margin-bottom:10px;">Start 1 Free Recruiting Search</h2>
+  <p style="color:#4a5a75;max-width:640px;">Give us your hardest role. We'll do the sourcing work and send you the list of people we would approach, and why. No obligation to do anything with it.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:26px;">
+    <div>
+      <div style="font-weight:800;margin-bottom:10px;">You tell us</div>
+      <ul style="color:#4a5a75;font-size:16px;margin:0;padding-left:20px;">
+        <li>The role and must-have skills</li>
+        <li>Location and work arrangement</li>
+        <li>Anything that makes it hard</li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-weight:800;margin-bottom:10px;">We send back</div>
+      <ul style="color:#4a5a75;font-size:16px;margin:0;padding-left:20px;">
+        <li>The candidates we would pursue</li>
+        <li>Why each one fits</li>
+        <li>Where they are and how we'd reach them</li>
+      </ul>
+    </div>
+  </div>
+
+  <form id="search-form" onsubmit="return submitIntake(event,'search')" style="margin-top:28px;background:#fafbfd;border:1px solid #e8eaf0;border-radius:16px;padding:24px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <input name="name" placeholder="Your name" required style="padding:13px 15px;border:1px solid #d8dbe4;border-radius:10px;font-size:15px;">
+      <input name="email" type="email" placeholder="Work email" required style="padding:13px 15px;border:1px solid #d8dbe4;border-radius:10px;font-size:15px;">
+      <input name="company" placeholder="Company" style="padding:13px 15px;border:1px solid #d8dbe4;border-radius:10px;font-size:15px;">
+      <input name="title" placeholder="Role you're hiring" required style="padding:13px 15px;border:1px solid #d8dbe4;border-radius:10px;font-size:15px;">
+    </div>
+    <textarea name="notes" rows="3" placeholder="Must-have skills, location, and what makes this role hard…" style="width:100%;margin-top:14px;padding:13px 15px;border:1px solid #d8dbe4;border-radius:10px;font-size:15px;font-family:inherit;"></textarea>
+    <button type="submit" style="margin-top:16px;background:#e8590c;color:#fff;font-weight:800;font-size:17px;padding:15px 32px;border:none;border-radius:12px;cursor:pointer;">Start my free search →</button>
+    <p id="search-msg" style="color:#1a7f4e;font-weight:700;margin:12px 0 0;display:none;"></p>
+  </form>
+  <p style="font-size:13px;color:#8a93a6;margin-top:14px;">One search per company. You keep the list either way.</p>
+</section>
+
+<section class="offer" id="agent">
+  <span class="offer-badge" style="background:#e6f7ee;color:#1a7f4e;">Your first specialist is on us</span>
+  <h2 style="font-size:clamp(30px,4.4vw,44px);font-weight:800;letter-spacing:-1px;margin-bottom:10px;">Hire 1 Free Agent</h2>
+  <p style="color:#4a5a75;max-width:640px;">Tell us one job you wish someone else handled. We'll build and deploy a specialist that actually does it — not a demo, a working agent.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:24px;">
+    <div style="border:1px solid #e8eaf0;border-radius:12px;padding:14px;text-align:center;font-weight:700;">Recruiting</div>
+    <div style="border:1px solid #e8eaf0;border-radius:12px;padding:14px;text-align:center;font-weight:700;">Lead Generation</div>
+    <div style="border:1px solid #e8eaf0;border-radius:12px;padding:14px;text-align:center;font-weight:700;">Sales</div>
+    <div style="border:1px solid #e8eaf0;border-radius:12px;padding:14px;text-align:center;font-weight:700;">Research</div>
+    <div style="border:1px solid #e8eaf0;border-radius:12px;padding:14px;text-align:center;font-weight:700;">GEO / AI Search</div>
+    <div style="border:1px solid #e8eaf0;border-radius:12px;padding:14px;text-align:center;font-weight:700;">Content</div>
+    <div style="border:1px solid #e8eaf0;border-radius:12px;padding:14px;text-align:center;font-weight:700;">RevOps</div>
+    <div style="border:1px solid #e8eaf0;border-radius:12px;padding:14px;text-align:center;font-weight:700;">Support</div>
+  </div>
+
+  <form id="agent-form" onsubmit="return submitIntake(event,'agent')" style="margin-top:26px;background:#fafbfd;border:1px solid #e8eaf0;border-radius:16px;padding:24px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <input name="name" placeholder="Your name" required style="padding:13px 15px;border:1px solid #d8dbe4;border-radius:10px;font-size:15px;">
+      <input name="email" type="email" placeholder="Work email" required style="padding:13px 15px;border:1px solid #d8dbe4;border-radius:10px;font-size:15px;">
+      <input name="company" placeholder="Company" style="padding:13px 15px;border:1px solid #d8dbe4;border-radius:10px;font-size:15px;">
+      <select name="title" required style="padding:13px 15px;border:1px solid #d8dbe4;border-radius:10px;font-size:15px;">
+        <option value="">Which job first?</option>
+        <option>Recruiting</option><option>Lead Generation</option><option>Sales</option>
+        <option>Research</option><option>GEO / AI Search</option><option>Content</option>
+        <option>RevOps</option><option>Customer Support</option>
+      </select>
+    </div>
+    <textarea name="notes" rows="3" placeholder="What does this job look like today? How long does it take you each week?" style="width:100%;margin-top:14px;padding:13px 15px;border:1px solid #d8dbe4;border-radius:10px;font-size:15px;font-family:inherit;"></textarea>
+    <button type="submit" style="margin-top:16px;background:#0f1e3d;color:#fff;font-weight:800;font-size:17px;padding:15px 32px;border:none;border-radius:12px;cursor:pointer;">Hire my first specialist →</button>
+    <p id="agent-msg" style="color:#1a7f4e;font-weight:700;margin:12px 0 0;display:none;"></p>
+  </form>
+</section>
+
+<section class="offer" id="workforce" style="text-align:center;">
+  <span class="offer-badge seven">Start with one</span>
+  <h2 style="font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-1px;">One search. One agent. Zero commitment.</h2>
+  <p style="color:#4a5a75;max-width:620px;margin:0 auto 24px;">Both start the same way: you give us one real problem, we show you what we'd do about it. If it's useful, we talk about doing more. If it isn't, you keep everything we sent.</p>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+    <a href="#search" style="background:#e8590c;color:#fff;font-weight:800;font-size:17px;padding:16px 32px;border-radius:14px;">Give us your hardest role</a>
+    <a href="#agent" style="background:#0f1e3d;color:#fff;font-weight:800;font-size:17px;padding:16px 32px;border-radius:14px;">Give us one job to take over</a>
+  </div>
+</section>
+
+<section class="offer" id="talk">
+  <span class="offer-badge seven">Enterprise / complex</span>
+  <h2 style="font-size:clamp(26px,3.6vw,36px);font-weight:800;letter-spacing:-1px;margin-bottom:10px;">Talk to ViewsAI</h2>
+  <p style="color:#4a5a75;max-width:640px;">Embedded teams, multi-role coverage, agent networks, integrations, SLAs, geographic exclusivity. Tell us the outcome you're responsible for and we'll design the workforce around it.</p>
+  <p style="color:#4a5a75;margin-top:14px;">Email <a href="mailto:brendan@tryviewsai.com" style="color:#e8590c;font-weight:700;">brendan@tryviewsai.com</a> — a human replies.</p>
+</section>
+
+<script>
+async function submitIntake(e, kind){
+  e.preventDefault();
+  const f = e.target, msg = document.getElementById(kind + '-msg');
+  const data = Object.fromEntries(new FormData(f).entries());
+  data.channel = 'website';
+  data.lead_magnet = kind === 'search' ? 'free-recruiting-search' : 'free-agent';
+  data.notes = (kind === 'search' ? 'FREE SEARCH — ' : 'FREE AGENT — ') + (data.notes || '');
+  msg.style.display = 'block'; msg.style.color = '#4a5a75'; msg.textContent = 'Sending…';
+  try {
+    const r = await fetch('https://lead-capture.bro768644.workers.dev/', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)
+    });
+    if (!r.ok) throw new Error('http ' + r.status);
+    msg.style.color = '#1a7f4e';
+    msg.textContent = kind === 'search'
+      ? 'Got it. We'll send your candidate list shortly.'
+      : 'Got it. We'll come back with your first specialist.';
+    f.reset();
+  } catch (err) {
+    msg.style.color = '#c0392b';
+    msg.textContent = 'Something went wrong — email brendan@tryviewsai.com and we'll pick it up.';
+  }
+  return false;
+}
+</script>
