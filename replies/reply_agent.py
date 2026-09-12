@@ -32,7 +32,7 @@ from pathlib import Path
 HOME = Path.home()
 ENV_FILES = [HOME / ".n8n" / ".env", Path("/Users/viewsai/ViewsOSComplete/.env.keys")]
 
-CHATWOOT_URL = "http://localhost:3002"       # via oracle tunnel; Host header below bypasses the SSL redirect
+CHATWOOT_URL = "https://chat.tryviewsai.com"   # public (tunnel restored 2026-09-12)
 CHATWOOT_HOST_HEADER = "chat.tryviewsai.com"
 CHATWOOT_ACCOUNT = 1
 CHATWOOT_INBOX = 2                            # "ViewsAI API / Integrations"
@@ -67,6 +67,8 @@ MODEL_DRAFT = "claude-sonnet-4-6"            # drafting quality
 # ---------------------------------------------------------------- http helpers
 def _req(url, method="GET", headers=None, data=None, timeout=60):
     h = dict(headers or {})
+    # Cloudflare (1010) blocks default python UAs on the public tunnels
+    h.setdefault("User-Agent", "ViewsAI-ReplyAgent/1.0 (+https://obrienhq.com)")
     body = None
     if data is not None:
         body = json.dumps(data).encode()
@@ -90,9 +92,7 @@ def sb(path, method="GET", data=None):
 def chatwoot(path, method="GET", data=None):
     # Host + X-Forwarded-Proto bypass Chatwoot's force-SSL redirect on localhost
     return _req(f"{CHATWOOT_URL}/api/v1/accounts/{CHATWOOT_ACCOUNT}{path}", method,
-                {"api_access_token": CHATWOOT_TOKEN,
-                 "Host": CHATWOOT_HOST_HEADER,
-                 "X-Forwarded-Proto": "https"}, data)
+                {"api_access_token": CHATWOOT_TOKEN}, data)
 
 
 def claude(prompt, system, model, max_tokens=700):
@@ -476,6 +476,19 @@ def handle(from_email, subject, body, to_mailbox=None, dry_run=False, source="ma
 
     posthog("reply_received", {"from": from_email, "intent": intent,
                                "urgency": c.get("urgency"), "action": action})
+
+    # behavioral graph: a reply is the strongest intent signal (weight 10)
+    try:
+        sb("contact_events", "POST", [{
+            "email": from_email, "event": "REPLY", "source": "email",
+            "campaign": None, "asset": "reply",
+            "signal_weight": 10,
+            "metadata": {"intent": intent, "urgency": c.get("urgency"),
+                         "subject": (subject or "")[:200]},
+        }])
+        print("  behavior: REPLY event recorded (weight 10)")
+    except Exception as e:
+        print("  behavior:", str(e)[:80])
 
     # newsletter tag: a replier is a real human -> tag them in Listmonk
     try:
