@@ -83,7 +83,10 @@ def setup_dataset():
 def push_and_run(timeout=3600):
     meta = KAGGLE_DIR / "kernel-metadata.json"
     m = json.loads(meta.read_text())
-    m["id"] = f"{user()}/joyvasa-kobe-talking"
+    # keep the slug in sync with kernel-metadata.json
+    m["id"] = m.get("id", f"{user()}/kobe-joyvasa-animal")
+    if not m["id"].startswith(user() + "/"):
+        m["id"] = f"{user()}/{m['id'].split('/')[-1]}"
     m["dataset_sources"] = [f"{user()}/{DATASET_SLUG}"]
     meta.write_text(json.dumps(m, indent=1))
     print(f"→ pushing kernel {m['id']} (GPU={m['enable_gpu']}, internet={m['enable_internet']})")
@@ -91,7 +94,8 @@ def push_and_run(timeout=3600):
     print(((r.stdout or '') + (r.stderr or ''))[-400:])
 
     print("→ waiting for completion (free GPU queue + ~10 min run)…")
-    start = time.time()
+    started_at = time.time()
+    start = started_at
     while time.time() - start < timeout:
         time.sleep(45)
         r = sh(f'kaggle kernels status {m["id"]}', check=False, capture=True)
@@ -108,10 +112,13 @@ def push_and_run(timeout=3600):
     print("→ downloading outputs…")
     r = sh(f'kaggle kernels output {m["id"]} -p "{DEST}"', check=False)
     print(((r.stdout or '') + (r.stderr or ''))[-400:])
-    vids = sorted(DEST.glob("*.mp4"), key=lambda p: p.stat().st_mtime, reverse=True)
-    if vids:
-        print("✅ got:", vids[0])
+    # only accept files written during THIS run (avoid stale library clips)
+    fresh = [p for p in DEST.glob("*.mp4") if p.stat().st_mtime >= started_at]
+    if fresh:
+        best = sorted(fresh, key=lambda p: p.stat().st_mtime, reverse=True)[0]
+        print("✅ got:", best)
         return True
+    print("(no new mp4 this run — check the kernel log)")
     print("✗ no mp4 downloaded — check the kernel log page")
     return False
 
