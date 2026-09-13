@@ -83,6 +83,9 @@ def endpoints():
     eps = {
         "freellm": ("http://localhost:4000/v1", "sk-litellm-master-key-change-me", "bearer"),
     }
+    # local ollama daemon — no key, no quota, works offline
+    eps["ollama-local"] = ("http://localhost:11434/v1", "ollama", "bearer")
+
     # ollama cloud (OpenAI-compatible /v1)
     oll = env("OLLAMA_API_KEY")
     if oll:
@@ -117,12 +120,36 @@ def probe(base, key, style, model_id):
         return False, int((time.time() - t0) * 1000), f"{type(e).__name__}: {str(e)[:80]}"
 
 
-def run():
+def run(deep=False):
+    """Default: CANARY mode — probe one model per provider instead of all of them.
+
+    Ollama Cloud draws from a limited free-usage allowance (resets biweekly), so probing
+    every model daily would spend the user's credits. Sibling models on a provider share
+    that provider's quota, so one probe per provider is enough to know it is up.
+    """
     chain = load_chain()
     eps = endpoints()
     results = []
-    print(f"pre-flight — {datetime.now(timezone.utc).isoformat()[:19]}Z")
-    for m in chain["order"]:
+    if not deep:
+        # choose a canary per provider from entries that are actually USABLE
+        # (never a credit-gated one) — siblings share the provider's quota.
+        canaries = {}
+        for m in chain["order"]:
+            if m.get("requires"):
+                continue
+            canaries.setdefault(m["provider"], id(m))
+        filtered, carried = [], []
+        for m in chain["order"]:
+            if m.get("requires") or canaries.get(m["provider"]) == id(m):
+                filtered.append(m)          # gated entries still get reported
+            else:
+                carried.append(m)           # assumed healthy if the canary passed
+        print(f"pre-flight (canary mode) — {datetime.now(timezone.utc).isoformat()[:19]}Z")
+    else:
+        filtered, carried = chain["order"], []
+        print(f"pre-flight (deep mode) — {datetime.now(timezone.utc).isoformat()[:19]}Z")
+
+    for m in filtered:
         need = m.get("requires")
         if need and not env(need):
             results.append({**m, "ok": False, "ms": None, "note": f"needs {need}",
@@ -140,9 +167,37 @@ def run():
                         "checked": datetime.now(timezone.utc).isoformat()})
         print(f"  {'✓' if ok else '✗'} {m['label'][:42]:44s} {str(ms)+'ms' if ms else '':>8s} {note[:52] if not ok else ''}")
 
-    # keep the user's PRIORITY order — only drop the ones that failed
-    healthy = [r for r in results if r["ok"]]
-    dead = [r for r in results if not r["ok"]]
+    # Rebuild in the ORIGINAL chain order so priorities are never reshuffled.
+    # (Probed canaries must not jump ahead of the models they stand in for.)
+    by_id = {id(r): r for r in results}
+    ok_providers = {r["provider"] for r in results if r["ok"]}
+    healthy = []
+    for m in chain["order"]:
+        if m.get("requires"):
+            continue                      # gated (needs credits/key) -> reported unavailable
+        r = by_id.get(id(m))
+        if r is not None:
+            if r["ok"]:
+                healthy.append(r)
+        elif m["provider"] in ok_providers:
+            healthy.append({**m, "ok": True, "ms": None, "note": "assumed ok (canary)",
+                            "checked": datetime.now(timezone.utc).isoformat()})
+
+    # everything not in the healthy queue, with a reason
+    dead = []
+    for m in chain["order"]:
+        if m.get("requires"):
+            dead.append({**m, "ok": False, "ms": None, "note": f"needs {m['requires']}",
+                         "checked": datetime.now(timezone.utc).isoformat()})
+            continue
+        r = by_id.get(id(m))
+        if r is not None:
+            if not r["ok"]:
+                dead.append(r)
+        elif m["provider"] not in ok_providers:
+            dead.append({**m, "ok": False, "ms": None, "note": "provider canary failed",
+                         "checked": datetime.now(timezone.utc).isoformat()})
+
     status = {
         "checked_at": datetime.now(timezone.utc).isoformat(),
         "healthy": healthy,
@@ -165,7 +220,8 @@ def notify(status):
     if status["healthy"]:
         lines.append(f"*{len(status['healthy'])} live models (your priority order):")
         for i, r in enumerate(status["healthy"][:8], 1):
-            lines.append(f"  {i}. {r['label']}  `{r['ms']}ms`")
+            ms = f"`{r['ms']}ms`" if r.get("ms") else "canary"
+            lines.append(f"  {i}. {r['label']}  {ms}")
     else:
         lines.append("⚠ *No models responded* — check the free proxy / keys.")
     un = status.get("unavailable") or []
@@ -201,10 +257,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--show", action="store_true")
     ap.add_argument("--notify", action="store_true")
+    ap.add_argument("--deep", action="store_true", help="probe EVERY model (spends Ollama free credits)")
     args = ap.parse_args()
     if args.show:
         return show()
-    st = run()
+    st = run(deep=args.deep)
     if args.notify:
         notify(st)
 

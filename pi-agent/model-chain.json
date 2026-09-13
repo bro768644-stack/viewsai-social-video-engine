@@ -103,6 +103,12 @@
       "id": "gpt-oss:20b",
       "label": "GPT-OSS 20B (Ollama Cloud, free)",
       "requires": null
+    },
+    {
+      "provider": "ollama-local",
+      "id": "llama3.2:latest",
+      "label": "Llama 3.2 3B (LOCAL, offline, no quota)",
+      "requires": null
     }
   ]
 }
