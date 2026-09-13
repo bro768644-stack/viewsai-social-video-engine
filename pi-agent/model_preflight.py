@@ -83,10 +83,10 @@ def endpoints():
     eps = {
         "freellm": ("http://localhost:4000/v1", "sk-litellm-master-key-change-me", "bearer"),
     }
-    # ollama cloud
+    # ollama cloud (OpenAI-compatible /v1)
     oll = env("OLLAMA_API_KEY")
     if oll:
-        eps["ollama"] = ("https://ollama.com/api", oll, "bearer")
+        eps["ollama-cloud"] = ("https://ollama.com/v1", oll, "bearer")
     return eps
 
 
@@ -163,7 +163,7 @@ def notify(status):
         return
     lines = [f"*Model chain pre-flight — {datetime.now(timezone.utc).date()}*", ""]
     if status["healthy"]:
-        lines.append(f"*{len(status["healthy"])} live models (your priority order):")
+        lines.append(f"*{len(status['healthy'])} live models (your priority order):")
         for i, r in enumerate(status["healthy"][:8], 1):
             lines.append(f"  {i}. {r['label']}  `{r['ms']}ms`")
     else:

@@ -1,0 +1,108 @@
+{
+  "version": 2,
+  "updated": null,
+  "order": [
+    {
+      "provider": "ollama-cloud",
+      "id": "deepseek-v4-pro:0813",
+      "label": "DeepSeek v4 Pro (Ollama Cloud)",
+      "requires": "OLLAMA_CREDITS"
+    },
+    {
+      "provider": "ollama-cloud",
+      "id": "deepseek-v4-flash:0731",
+      "label": "DeepSeek v4 Flash (Ollama Cloud)",
+      "requires": "OLLAMA_CREDITS"
+    },
+    {
+      "provider": "freellm",
+      "id": "or-nex-pro",
+      "label": "Claude-class (OpenRouter free)",
+      "requires": null
+    },
+    {
+      "provider": "freellm",
+      "id": "groq-gpt-oss-120b",
+      "label": "GPT-OSS 120B (Groq, free)",
+      "requires": null
+    },
+    {
+      "provider": "ollama-cloud",
+      "id": "gpt-oss:120b",
+      "label": "GPT-OSS 120B (Ollama Cloud, free)",
+      "requires": null
+    },
+    {
+      "provider": "freellm",
+      "id": "nemotron-ultra",
+      "label": "NVIDIA Nemotron Ultra (OR free)",
+      "requires": null
+    },
+    {
+      "provider": "ollama-cloud",
+      "id": "nemotron-3-ultra",
+      "label": "NVIDIA Nemotron 3 Ultra (Ollama Cloud, free)",
+      "requires": null
+    },
+    {
+      "provider": "freellm",
+      "id": "gemma-31b",
+      "label": "Gemma 31B (free)",
+      "requires": null
+    },
+    {
+      "provider": "ollama-cloud",
+      "id": "gemma4:31b",
+      "label": "Gemma 4 31B (Ollama Cloud, free)",
+      "requires": null
+    },
+    {
+      "provider": "freellm",
+      "id": "gemini-3-flash",
+      "label": "Gemini 3 Flash (free)",
+      "requires": null
+    },
+    {
+      "provider": "freellm",
+      "id": "minimax-m3",
+      "label": "MiniMax M3 (free)",
+      "requires": null
+    },
+    {
+      "provider": "freellm",
+      "id": "glm-5",
+      "label": "GLM-5 (free)",
+      "requires": null
+    },
+    {
+      "provider": "freellm",
+      "id": "groq-qwen-36-27b",
+      "label": "Qwen 3.6 27B (Groq, free)",
+      "requires": null
+    },
+    {
+      "provider": "ollama-cloud",
+      "id": "nemotron-3-super",
+      "label": "NVIDIA Nemotron 3 Super (Ollama Cloud, free)",
+      "requires": null
+    },
+    {
+      "provider": "ollama-cloud",
+      "id": "nemotron-3-nano:30b",
+      "label": "NVIDIA Nemotron 3 Nano (Ollama Cloud, free)",
+      "requires": null
+    },
+    {
+      "provider": "freellm",
+      "id": "groq-gpt-oss-20b",
+      "label": "GPT-OSS 20B (Groq, free)",
+      "requires": null
+    },
+    {
+      "provider": "ollama-cloud",
+      "id": "gpt-oss:20b",
+      "label": "GPT-OSS 20B (Ollama Cloud, free)",
+      "requires": null
+    }
+  ]
+}
